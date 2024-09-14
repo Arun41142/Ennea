@@ -1,0 +1,34 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+.orange {
+    color: rgba(204, 133, 1, 0.87);
+}
+
+.logo {
+    font-weight: 800;
+}
+
+.nav-container {
+    padding: 2.5% 6%;
+}
+
+img {
+    height: 350px;
+    width: 300px;
+}
+
+.img-container {
+    margin-top: 5%;
+}
+
+.movie-cards {
+    background-color: beige;
+}
+
+.movie-overview{
+    display: none;
+}

@@ -10,7 +10,7 @@ const apiKey = 'da931faae7c1fc6a740fba11c09abbc5';
 const yourBearerToken = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkYTkzMWZhYWU3YzFmYzZhNzQwZmJhMTFjMDlhYmJjNSIsIm5iZiI6MTcyNjA3ODM0OC4yMzk5NjgsInN1YiI6IjY2ZTE2Y2Y2YTRhNjQ0NjIzNjA1MTgxMSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.2SdeYkFhzfsyJMA-FjVPNEuD-MYoLPsyxMP8VE-jErg';
 
 const app = express();
-const port = 3002;
+const port = 3000;
 
 // bodyparser to get data from the ejs file 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -40,7 +40,7 @@ app.get('/', async (req, res) => {
         });
 
         const result = response.data.results;
-        const imageUrl = 'https://image.tmdb.org/t/p/w500'; // Correct base URL for images
+        const imageUrl = 'https://image.tmdb.org/t/p/w500'; 
         // console.log(result);
         res.render('index', { result, imageUrl });
     } catch (error) {
