@@ -1,0 +1,38 @@
+.product-card {
+    width: 250px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .product-image {
+    border-radius: 10px 10px 0 0;
+    height: 250px;
+    padding: 10%;
+    /* object-fit: cover; */
+  }
+  
+  .product-info {
+    padding: 10px 0;
+  }
+  
+  .product-category {
+    font-size: 12px;
+  }
+  
+  .product-title {
+    margin-top: 5px;
+  }
+  
+  .product-description {
+    display: block;
+    font-size: 14px;
+  }
+  
+  .product-price {
+    margin-top: 10px;
+  }
+  
+  .product-mrp {
+    color: #888;
+  }
+  
