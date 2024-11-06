@@ -8,12 +8,12 @@ import { useNavigate } from 'react-router-dom';
 const AddProduct = () => {
   const { addProduct } = useProducts();
   const [isVisible, setIsVisible] = useState(true);
-  const [loading, setLoading] = useState(false);  // New state for loading
+  const [loading, setLoading] = useState(false);  
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
   const handleAddProduct = async (values) => {
-    setLoading(true);  // Start loading
+    setLoading(true); 
 
     try {
       // Send the POST request to add the product
@@ -28,17 +28,15 @@ const AddProduct = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Add the product to context or local state if needed
-        addProduct(data);  // Update context with the new product
 
-        // Reset the form and close the modal
+        addProduct(data);  
+
+
         form.resetFields();
         setIsVisible(false);
 
-        // Show success message
         message.success('Product added successfully!');
 
-        // Redirect to the products page
         navigate('/products');
       } else {
         throw new Error(data.message || 'Failed to add product');
@@ -46,7 +44,7 @@ const AddProduct = () => {
     } catch (error) {
       message.error(`Error: ${error.message}`);
     } finally {
-      setLoading(false);  // End loading
+      setLoading(false);  
     }
   };
 
