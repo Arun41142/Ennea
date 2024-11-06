@@ -8,22 +8,46 @@ import { useNavigate } from 'react-router-dom';
 const AddProduct = () => {
   const { addProduct } = useProducts();
   const [isVisible, setIsVisible] = useState(true);
+  const [loading, setLoading] = useState(false);  // New state for loading
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const handleAddProduct = (values) => {
-    // Add the product to context or database
-    addProduct(values);
+  const handleAddProduct = async (values) => {
+    setLoading(true);  // Start loading
 
-    // Reset the form and close the modal
-    form.resetFields();
-    setIsVisible(false);
+    try {
+      // Send the POST request to add the product
+      const response = await fetch('https://dummyjson.com/products/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
 
-    // Show success message
-    message.success('Product added successfully!');
+      const data = await response.json();
 
-    // Redirect to the products page
-    navigate('/products');
+      if (response.ok) {
+        // Add the product to context or local state if needed
+        addProduct(data);  // Update context with the new product
+
+        // Reset the form and close the modal
+        form.resetFields();
+        setIsVisible(false);
+
+        // Show success message
+        message.success('Product added successfully!');
+
+        // Redirect to the products page
+        navigate('/products');
+      } else {
+        throw new Error(data.message || 'Failed to add product');
+      }
+    } catch (error) {
+      message.error(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);  // End loading
+    }
   };
 
   const handleCancel = () => {
@@ -44,7 +68,7 @@ const AddProduct = () => {
           <Button key="cancel" onClick={handleCancel}>
             Cancel
           </Button>,
-          <Button key="confirm" type="primary" onClick={() => form.submit()}>
+          <Button key="confirm" type="primary" loading={loading} onClick={() => form.submit()}>
             Confirm
           </Button>,
         ]}
