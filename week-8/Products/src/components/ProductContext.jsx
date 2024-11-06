@@ -1,10 +1,11 @@
 import React, { createContext, useReducer, useContext, useEffect } from 'react';
 import axios from 'axios';
+import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const initialState = {
   products: [],
+  searchQuery: '',
 };
-
 
 function productReducer(state, action) {
   switch (action.type) {
@@ -12,6 +13,8 @@ function productReducer(state, action) {
       return { ...state, products: action.payload };
     case 'ADD_PRODUCT':
       return { ...state, products: [...state.products, action.payload] };
+    case 'SET_SEARCH_QUERY':
+      return { ...state, searchQuery: action.payload };
     default:
       return state;
   }
@@ -19,31 +22,59 @@ function productReducer(state, action) {
 
 const ProductContext = createContext();
 
-export const ProductProvider = ({ children }) => {
+const ProductProvider = ({ children }) => {
   const [state, dispatch] = useReducer(productReducer, initialState);
 
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
+      const response = await axios.get('https://dummyjson.com/products');
+      return response.data.products;
+    },
+  });
+  
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get('https://dummyjson.com/products');
-        dispatch({ type: 'SET_PRODUCTS', payload: response.data.products });
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-    fetchProducts();
-  }, []);
+    if (data) {
+      dispatch({ type: 'SET_PRODUCTS', payload: data });
+    }
+  }, [data]);
 
   const addProduct = (newProduct) => {
     dispatch({ type: 'ADD_PRODUCT', payload: newProduct });
   };
 
+  const setSearchQuery = (query) => {
+    dispatch({ type: 'SET_SEARCH_QUERY', payload: query });
+  };
+
   return (
-    <ProductContext.Provider value={{ products: state.products, addProduct }}>
+    <ProductContext.Provider value={{ 
+      products: state.products, 
+      searchQuery: state.searchQuery, 
+      addProduct, 
+      setSearchQuery,
+      isLoading,
+      error
+    }}>
       {children}
     </ProductContext.Provider>
   );
 };
 
-// Custom hook to use products
-export const useProducts = () => useContext(ProductContext);
+
+const useProducts = () => useContext(ProductContext);
+
+
+const queryClient = new QueryClient();
+
+const AppProvider = ({ children }) => (
+  <QueryClientProvider client={queryClient}>
+    <ProductProvider>
+      {children}
+    </ProductProvider>
+  </QueryClientProvider>
+);
+
+
+export { AppProvider, ProductProvider, useProducts };

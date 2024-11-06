@@ -1,18 +1,29 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input, InputNumber, Button } from 'antd';
+import { Modal, Form, Input, InputNumber, Button, message } from 'antd';
 import { useProducts } from './ProductContext';
 import { PlusCircleOutlined } from '@ant-design/icons'; 
 import DatePickerComponent from './DatePickerComponent';
+import { useNavigate } from 'react-router-dom';
 
 const AddProduct = () => {
   const { addProduct } = useProducts();
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   const handleAddProduct = (values) => {
+    // Add the product to context or database
     addProduct(values);
+
+    // Reset the form and close the modal
     form.resetFields();
     setIsVisible(false);
+
+    // Show success message
+    message.success('Product added successfully!');
+
+    // Redirect to the products page
+    navigate('/products');
   };
 
   const handleCancel = () => {
@@ -25,27 +36,18 @@ const AddProduct = () => {
 
   return (
     <>
-        <h1 style={{margin:'5%',textAlign:'center'}}>You Can Add The Products You need.....</h1>
-      <Button
-        type="primary"
-        shape="circle"
-        icon={<PlusCircleOutlined />}
-        style={{
-          position: 'fixed',
-          bottom: 20,
-          right: 20,
-          zIndex: 10,
-          borderRadius: '50%',
-          fontSize: '24px',
-        }}
-        onClick={handleShowModal}
-      />
-      
       <Modal
         title="Add New Product"
         visible={isVisible}
         onCancel={handleCancel}
-        footer={null}
+        footer={[
+          <Button key="cancel" onClick={handleCancel}>
+            Cancel
+          </Button>,
+          <Button key="confirm" type="primary" onClick={() => form.submit()}>
+            Confirm
+          </Button>,
+        ]}
       >
         <Form form={form} onFinish={handleAddProduct} layout="vertical">
           <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please input the product title!' }]}>
@@ -66,12 +68,9 @@ const AddProduct = () => {
           <Form.Item name="discountPercentage" label="Discount (%)" rules={[{ required: true, message: 'Please input the discount percentage!' }]}>
             <InputNumber min={0} max={100} style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item name="Date" label="start and End date" rules={[{ required: true, message: 'Please input the discount percentage!' }]}>
-            <DatePickerComponent/>
+          <Form.Item name="Date" label="Start and End Date">
+            <DatePickerComponent />
           </Form.Item>
-          <Button type="primary" htmlType="submit">
-            Add Product
-          </Button>
         </Form>
       </Modal>
     </>

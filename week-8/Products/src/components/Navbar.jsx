@@ -1,9 +1,10 @@
 import '../styles/nav.css';
-import React, { useState } from 'react';
+import React,{useState} from 'react';
 import styled from 'styled-components';
 import { Input, Button } from 'antd';
 import { useProducts } from './ProductContext';
-import { useLocation, useNavigate,Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import AddProduct from './AddProduct';
 
 const Container = styled.div`
   display: flex;
@@ -21,18 +22,18 @@ const Links = styled.div`
   font-size:18px;
 `;
 
-const Navbar = () => {
-  const { products } = useProducts();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filteredProducts, setFilteredProducts] = useState(products);
-  const navigate = useNavigate();
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
+const Navbar = () => {
+  const { searchQuery, setSearchQuery } = useProducts();
+  const navigate = useNavigate();
+  const [renderModal,setRenderModal]=useState(false);
+  
+  const handleAddBtn = () => {
+    setRenderModal((prev) => !prev);
   };
 
   const handleSearchClick = () => {
-    navigate('/products', { state: { searchQuery } });
+    navigate('/products');
   };
 
   return (
@@ -41,22 +42,22 @@ const Navbar = () => {
       <Links>
         <Link to="/">Home</Link>
         <Link to="/products">Products</Link>
-        <Link to="/add">Add Products</Link>
+        <button className='add-btn' onClick={handleAddBtn}>Add Product</button>
       </Links>
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <Input 
           placeholder="Search products" 
           value={searchQuery} 
-          onChange={(e) => {setSearchQuery(e.target.value);navigate('/products', { state: { searchQuery } });}} 
+          onChange={(e) => setSearchQuery(e.target.value)}
           style={{ width: '200px' }}
         />
         <Button type="primary" onClick={handleSearchClick}>
           Search
         </Button>
-        
       </div>
+      {renderModal && <AddProduct/>}
     </Container>
   );
-}
+};
 
 export default Navbar;
