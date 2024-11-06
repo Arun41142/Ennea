@@ -1,3 +1,19 @@
 .red{
     background-color: red;
 }
+
+a{
+    color: white;
+    text-decoration: none;
+}
+
+.brand{
+    margin-left:30px;
+}
+.brand-title{
+    color: #0b88e2;
+}
+
+.nav-container {
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+}
