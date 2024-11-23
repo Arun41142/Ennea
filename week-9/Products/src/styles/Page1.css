@@ -1,0 +1,8 @@
+.page1-container {
+    padding: 20px;
+  }
+  
+  .ant-modal {
+    z-index: 1050 !important;
+  }
+  
