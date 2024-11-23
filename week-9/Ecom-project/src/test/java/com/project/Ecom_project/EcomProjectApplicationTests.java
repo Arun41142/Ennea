@@ -1,10 +1,10 @@
-package com.web.DemoWebApp;
+package com.project.Ecom_project;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DemoWebAppApplicationTests {
+class EcomProjectApplicationTests {
 
 	@Test
 	void contextLoads() {
