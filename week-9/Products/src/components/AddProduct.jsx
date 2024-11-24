@@ -11,24 +11,23 @@ const AddProduct = () => {
 
   const submitHandler = (values) => {
     setLoading(true);
-
-    const formData = new FormData();
-    formData.append(
-      "prod",
-      new Blob([JSON.stringify(values)], { type: "application/json" })
-    );
-    if (values.imageFile) {
-      formData.append("imageFile", values.imageFile.file);
-    }
-
-
+  
+    // Format releaseDate to 'dd-MM-yyyy'
+    const formattedValues = {
+      ...values,
+      releaseDate: values.releaseDate.format("DD-MM-YYYY"),
+    };
+  
+    // console.log(formattedValues);
+    
     axios
-      .post("http://localhost:8080/Api/products", formData, {
+      .post("http://localhost:8090/Api/products", formattedValues, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       })
       .then((response) => {
+        // console.log(response.data);
         message.success("Product added successfully");
         form.resetFields();
       })
@@ -40,6 +39,7 @@ const AddProduct = () => {
         setLoading(false);
       });
   };
+  
 
   return (
     <div style={{ maxWidth: "700px", margin: "50px auto", padding: "20px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}>
@@ -128,15 +128,15 @@ const AddProduct = () => {
 
         {/* Image */}
         <Form.Item
-          name="imageFile"
-          label="Product Image"
-          valuePropName="file"
-          rules={[{ required: true, message: "Please upload an image" }]}
+          name="imageUrl"
+          label="Product Image URL"
+          rules={[
+            { required: true, message: "Please provide the image URL" },
+          ]}
         >
-          <Upload beforeUpload={() => false} maxCount={1}>
-            <Button icon={<UploadOutlined />}>Upload Image</Button>
-          </Upload>
-        </Form.Item>
+  <Input placeholder="Enter image URL" />
+</Form.Item>
+
 
  
         <Form.Item name="productAvailable" valuePropName="checked">

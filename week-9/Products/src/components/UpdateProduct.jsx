@@ -1,222 +1,159 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Form, Input, Button, Select, DatePicker, Checkbox, message } from "antd";
 import axios from "axios";
-import { Navigate , useNavigate } from "react-router-dom";
+import moment from "moment";
+import { useParams } from "react-router-dom"; // Import useParams 
+const { Option } = Select;
 
-const UpdateProduct = () => {
-  const { id } = useParams();
-  const [product, setProduct] = useState({});
-  const [image, setImage] = useState(null);
-  const [updateProduct, setUpdateProduct] = useState({
-    id: null,
-    name: "",
-    description: "",
-    brand: "",
-    price: "",
-    category: "",
-    releaseDate: "",
-    productAvailable: false,
-    stockQuantity: "",
-  });
+const UpdateProduct = ({ match }) => {
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
+  const { id } = useParams(); // Get product ID from route params
+
+  // Fetch product data when component mounts
+  console.log(id);
+  
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8080/Api/products/${id}`
-        );
-        const productData = response.data;
-
-        setProduct(productData);
-        setImage(productData.imageData); // Assume imageData is a base64 string
-        setUpdateProduct(productData);
-        console.log(updateProduct);
-        
-      } catch (error) {
+    axios
+      .get(`http://localhost:8090/Api/products/${id}`)
+      .then((response) => {
+        form.setFieldsValue({
+          ...response.data,
+          releaseDate: response.data.releaseDate ? moment(response.data.releaseDate, "DD-MM-YYYY") : null,
+        });
+      })
+      .catch((error) => {
         console.error("Error fetching product:", error);
-      }
+        message.error("Error fetching product data");
+      });
+  }, [id, form]);
+
+  // Handle form submission
+  const submitHandler = (values) => {
+    setLoading(true);
+
+    const formattedValues = {
+      ...values,
+      releaseDate: values.releaseDate.format("DD-MM-YYYY"), // Format release date
     };
 
-    fetchProduct();
-  }, [id]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const updatedProduct = new FormData();
-    if (image instanceof File) {
-      updatedProduct.append("imageFile", image);
-    } else {
-      updatedProduct.append("imageData", image); // Retain existing image if not updated
-    }
-    updatedProduct.append(
-      "product",
-      new Blob([JSON.stringify(updateProduct)], { type: "application/json" })
-    );
-
-    try {
-      await axios.put(
-        `http://localhost:8080/Api/product/${id}`,
-        updatedProduct,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      alert("Product updated successfully!");
-    } catch (error) {
-      console.error("Error updating product:", error);
-      alert("Failed to update product. Please try again.");
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUpdateProduct({
-      ...updateProduct,
-      [name]: value,
-    });
-  };
-
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    axios
+      .put(`http://localhost:8090/Api/products/${id}`, formattedValues, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then(() => {
+        message.success("Product updated successfully");
+        form.resetFields();
+      })
+      .catch((error) => {
+        message.error("Error updating product");
+        console.error("Error:", error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
-    <div className="update-product-container">
-      <div className="center-container">
-        <h1>Update Product</h1>
-        <form className="row g-3 pt-5" onSubmit={handleSubmit}>
-          <div className="col-md-6">
-            <label className="form-label">
-              <h6>Name</h6>
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Enter product name"
-              value={updateProduct.name}
-              onChange={handleChange}
-              name="name"
-            />
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">
-              <h6>Brand</h6>
-            </label>
-            <input
-              type="text"
-              name="brand"
-              className="form-control"
-              value={updateProduct.brand}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="col-12">
-            <label className="form-label">
-              <h6>Description</h6>
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              name="description"
-              onChange={handleChange}
-              value={updateProduct.description}
-            />
-          </div>
-          <div className="col-5">
-            <label className="form-label">
-              <h6>Price</h6>
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              onChange={handleChange}
-              value={updateProduct.price}
-              name="price"
-            />
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">
-              <h6>Category</h6>
-            </label>
-            <select
-              className="form-select"
-              value={updateProduct.category}
-              onChange={handleChange}
-              name="category"
-            >
-              <option value="">Select category</option>
-              <option value="laptop">Laptop</option>
-              <option value="headphone">Headphone</option>
-              <option value="mobile">Mobile</option>
-              <option value="electronics">Electronics</option>
-              <option value="toys">Toys</option>
-              <option value="fashion">Fashion</option>
-            </select>
-          </div>
+    <div style={{ maxWidth: "700px", margin: "50px auto" }}>
+      <h2 style={{ textAlign: "center" }}>Update Product</h2>
+      <Form form={form} layout="vertical" onFinish={submitHandler}>
+        {/* Product Name */}
+        <Form.Item
+          name="name"
+          label="Product Name"
+          rules={[{ required: true, message: "Please enter the product name" }]}
+        >
+          <Input placeholder="Enter product name" />
+        </Form.Item>
 
-          <div className="col-md-4">
-            <label className="form-label">
-              <h6>Stock Quantity</h6>
-            </label>
-            <input
-              type="number"
-              className="form-control"
-              onChange={handleChange}
-              value={updateProduct.stockQuantity}
-              name="stockQuantity"
-            />
-          </div>
-          <div className="col-md-8">
-            <label className="form-label">
-              <h6>Image</h6>
-            </label>
-            <img
-              src={image}
-              alt="Product"
-              style={{
-                width: "100%",
-                height: "180px",
-                objectFit: "cover",
-                margin: "5px 0",
-              }}
-            />
-            <input
-              className="form-control"
-              type="file"
-              onChange={handleImageChange}
-            />
-          </div>
-          <div className="col-12">
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                name="productAvailable"
-                checked={updateProduct.productAvailable}
-                onChange={(e) =>
-                  setUpdateProduct({
-                    ...updateProduct,
-                    productAvailable: e.target.checked,
-                  })
-                }
-              />
-              <label className="form-check-label">Product Available</label>
-            </div>
-          </div>
+        {/* Brand */}
+        <Form.Item
+          name="brand"
+          label="Brand"
+          rules={[{ required: true, message: "Please enter the brand" }]}
+        >
+          <Input placeholder="Enter brand name" />
+        </Form.Item>
 
-          <div className="col-12">
-            <button type="submit" className="btn btn-primary">
-              Submit
-            </button>
-          </div>
-        </form>
-      </div>
+        {/* Description */}
+        <Form.Item
+          name="description"
+          label="Description"
+          rules={[{ required: true, message: "Please enter the product description" }]}
+        >
+          <Input.TextArea rows={3} placeholder="Enter product description" />
+        </Form.Item>
+
+        {/* Price */}
+        <Form.Item
+          name="price"
+          label="Price"
+          rules={[{ required: true, message: "Please enter the product price" }]}
+        >
+          <Input prefix="$" placeholder="Enter product price" />
+        </Form.Item>
+
+        {/* Category */}
+        <Form.Item
+          name="category"
+          label="Category"
+          rules={[{ required: true, message: "Please select a category" }]}
+        >
+          <Select placeholder="Select category">
+            <Option value="Laptop">Laptop</Option>
+            <Option value="Headphone">Headphone</Option>
+            <Option value="Mobile">Mobile</Option>
+            <Option value="Electronics">Electronics</Option>
+            <Option value="Toys">Toys</Option>
+            <Option value="Fashion">Fashion</Option>
+          </Select>
+        </Form.Item>
+
+        {/* Stock Quantity */}
+        <Form.Item
+          name="stockQuantity"
+          label="Stock Quantity"
+          rules={[{ required: true, message: "Please enter stock quantity" }]}
+        >
+          <Input placeholder="Enter stock quantity" />
+        </Form.Item>
+
+        {/* Release Date */}
+        <Form.Item
+          name="releaseDate"
+          label="Release Date"
+          rules={[{ required: true, message: "Please select the release date" }]}
+        >
+          <DatePicker style={{ width: "100%" }} />
+        </Form.Item>
+
+        {/* Image URL */}
+        <Form.Item
+          name="imageUrl"
+          label="Product Image URL"
+          rules={[{ required: true, message: "Please provide the image URL" }]}
+        >
+          <Input placeholder="Enter image URL" />
+        </Form.Item>
+
+        {/* Availability */}
+        <Form.Item name="productAvailable" valuePropName="checked">
+          <Checkbox>Product Available</Checkbox>
+        </Form.Item>
+
+        {/* Submit Button */}
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={loading} block>
+            {loading ? "Submitting..." : "Update Product"}
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 };
 
 export default UpdateProduct;
- 

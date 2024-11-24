@@ -28,7 +28,7 @@ const ProductProvider = ({ children }) => {
   const { data, error, isLoading } = useQuery({
     queryKey: ['products'],
     queryFn: async () => {
-      const response = await axios.get('http://localhost:8080/Api/products');
+      const response = await axios.get('http://localhost:8090/Api/products');
       return response.data;
     },
   });

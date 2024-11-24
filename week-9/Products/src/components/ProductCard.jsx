@@ -45,16 +45,14 @@ const ProductCard = ({ product }) => {
   }
   console.log(product);
   
-  const imageUrl = product.imageData
-  ? `data:image/jpeg;base64,${product.imageData}`
-  : "fallback-image-url.jpg"; 
+  
   
   return (
     <Card
       hoverable
       className="product-card"
       onClick={handleClick}
-      cover={<img alt={product.title} src={imageUrl} className="product-image" />}
+      cover={<img alt={product.title} src={product.imageurl} className="product-image" />}
     >
       <div className="product-info">
         <Tag color="blue" className="product-category">

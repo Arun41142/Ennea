@@ -14,8 +14,10 @@ const Product = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/Api/products/${id}`);
+        const response = await axios.get(`http://localhost:8090/Api/products/${id}`);
         setProduct(response.data);
+        console.log(response.data);
+        
       } catch (error) {
         console.error("Error fetching product:", error);
         message.error("Failed to fetch product details");
@@ -27,6 +29,8 @@ const Product = () => {
     fetchProduct();
   }, [id]);
 
+  // console.log(product.imageUrl);
+  
   const handleEditClick = () => {
     navigate(`/product/${product.id}`);
   };
@@ -40,7 +44,7 @@ const Product = () => {
       cancelText: "Cancel",
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:8080/Api/products/${product.id}`);
+          await axios.delete(`http://localhost:8090/Api/products/${product.id}`);
           message.success("Product deleted successfully!");
           navigate("/products");
         } catch (error) {
@@ -51,9 +55,6 @@ const Product = () => {
     });
   };
 
-  const imageUrl = product?.imageData
-    ? `data:image/jpeg;base64,${product.imageData}`
-    : "fallback-image-url.jpg";
 
   if (loading) {
     return (
@@ -83,7 +84,7 @@ const Product = () => {
         hoverable
         cover={
           <Image
-            src={imageUrl}
+            src={product.imageUrl}
             alt="Product"
             fallback="fallback-image-url.jpg"
             className="product-detail-image"

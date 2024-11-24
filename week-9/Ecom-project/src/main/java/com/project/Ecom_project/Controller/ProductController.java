@@ -4,12 +4,11 @@ import com.project.Ecom_project.Model.Product;
 import com.project.Ecom_project.Service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+
 import java.util.List;
 
 @RestController
@@ -42,28 +41,36 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<?> addProduct(
-            @RequestPart("prod") Product prod,
-            @RequestPart("imageFile") MultipartFile imageFile) {
+    public ResponseEntity<?> addProduct(@RequestBody Product prod) {
 
         try {
-            Product product = service.addProduct(prod, imageFile);
+            Product product = service.addProduct(prod);
             return new ResponseEntity<>(product, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping("/products/{id}")
-    public ResponseEntity<String> updateProduct(@PathVariable int id ,@RequestPart("prod") Product prod,
-                                                @RequestPart("imageFile") MultipartFile imageFile ) throws IOException {
-        Product product = service.updateProduct(id,prod,imageFile);
-        if(product != null){
-            return new ResponseEntity<>("updated Product Successfully" ,HttpStatus.OK);
-        }
-        else{
-            return new ResponseEntity<>("Failed to Update Product",HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> updateProduct(@PathVariable int id, @RequestBody Product updatedProduct) {
+        Product existingProduct = service.getElementById(id);
+        if (existingProduct != null) {
+            existingProduct.setName(updatedProduct.getName());
+            existingProduct.setDescription(updatedProduct.getDescription());
+            existingProduct.setCategory(updatedProduct.getCategory());
+            existingProduct.setPrice(updatedProduct.getPrice());
+            existingProduct.setReleaseDate(updatedProduct.getReleaseDate());
+            existingProduct.setProductAvailable(updatedProduct.isProductAvailable());
+            existingProduct.setStockQuantity(updatedProduct.getStockQuantity());
+            existingProduct.setImageUrl(updatedProduct.getImageUrl());
+
+            service.updateProduct(existingProduct);
+            return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
         }
     }
+
 
     @DeleteMapping("/products/{id}")
     public ResponseEntity<String> deleteProduct(@PathVariable int id) {
@@ -75,15 +82,6 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/products/search")
-    public ResponseEntity<List<Product>> searchProducts(@RequestParam String keyword) {
-        List<Product> products = service.searchProducts(keyword);
-        if (!products.isEmpty()) {
-            return new ResponseEntity<>(products, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
 
 }
 

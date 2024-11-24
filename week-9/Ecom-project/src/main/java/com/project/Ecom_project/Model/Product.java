@@ -28,35 +28,8 @@ public class Product {
     private boolean productAvailable;
     private int stockQuantity;
 
-    private String imageName;
-    private String imageType;
-
-    @Lob
-    private byte[] imageData;
-
-    public String getImageName() {
-        return imageName;
-    }
-
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
-    }
-
-    public byte[] getImageData() {
-        return imageData;
-    }
-
-    public void setImageData(byte[] imageData) {
-        this.imageData = imageData;
-    }
-
-    public String getImageType() {
-        return imageType;
-    }
-
-    public void setImageType(String imageType) {
-        this.imageType = imageType;
-    }
+    @Column(length = 10000000)
+    private String imageUrl;
 
     public int getId() {
         return id;
@@ -71,7 +44,7 @@ public class Product {
     }
 
     public void setName(String name) {
-        name = name;
+        this.name = name;
     }
 
     public String getDescription() {
@@ -79,7 +52,7 @@ public class Product {
     }
 
     public void setDescription(String description) {
-        description = description;
+        this.description = description;
     }
 
     public String getCategory() {
@@ -87,7 +60,7 @@ public class Product {
     }
 
     public void setCategory(String category) {
-        category = category;
+        this.category = category;
     }
 
     public BigDecimal getPrice() {
@@ -95,7 +68,7 @@ public class Product {
     }
 
     public void setPrice(BigDecimal price) {
-        price = price;
+        this.price = price;
     }
 
     public Date getReleaseDate() {
@@ -103,7 +76,7 @@ public class Product {
     }
 
     public void setReleaseDate(Date releaseDate) {
-        releaseDate = releaseDate;
+        this.releaseDate = releaseDate;
     }
 
     public boolean isProductAvailable() {
@@ -120,5 +93,13 @@ public class Product {
 
     public void setStockQuantity(int stockQuantity) {
         this.stockQuantity = stockQuantity;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
